@@ -1,0 +1,27 @@
+From 6065cf9f343f49c2e6d5702083f3f4d37861f16e Mon Sep 17 00:00:00 2001
+From: Yangbo Lu <yangbo.lu@nxp.com>
+Date: Fri, 18 Oct 2019 18:17:37 +0800
+Subject: [PATCH 1/2] Revert "lib/boilerplate: Fix build for mercury"
+
+This reverts commit f083112f44f9d57350c17dfa6df9d23056caa839.
+---
+ lib/boilerplate/ancillaries.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/lib/boilerplate/ancillaries.c b/lib/boilerplate/ancillaries.c
+index a0754cb..7e98141 100644
+--- a/lib/boilerplate/ancillaries.c
++++ b/lib/boilerplate/ancillaries.c
+@@ -126,9 +126,7 @@ void ___panic(const char *fn, const char *name,
+ 	if (asprintf(&p, "BUG in %s(): ", fn) < 0)
+ 		p = "BUG: ";
+ 	__printout(name, p, fmt, ap);
+-#ifdef CONFIG_XENO_COBALT
+ 	rt_print_flush_buffers();
+-#endif /* CONFIG_XENO_COBALT */
+ 	exit(1);
+ }
+ 
+-- 
+2.7.4
+
