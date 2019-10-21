@@ -23,6 +23,9 @@ copy_toolchain_lib_root = \
 			elif test -f $${LIBPATH}; then \
 				$(INSTALL) -D -m0755 $${LIBPATH} $(TARGET_DIR)/$${DESTDIR}/$${LIBNAME}; \
 				break ; \
+			elif test -d $${LIBPATH}; then \
+				cp -d -r $${LIBPATH} $(TARGET_DIR)/$${DESTDIR}/$${LIBNAME}; \
+				break; \
 			else \
 				exit -1; \
 			fi; \
