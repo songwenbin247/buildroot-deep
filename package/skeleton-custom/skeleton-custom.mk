@@ -15,7 +15,15 @@ SKELETON_CUSTOM_PROVIDES = skeleton
 
 SKELETON_CUSTOM_INSTALL_STAGING = YES
 
+SKELETON_CUSTOM_SITE = $(call qstrip,$(BR2_ROOTFS_SKELETON_CUSTOM_SITE))
+SKELETON_CUSTOM_SOURCE = $(call qstrip,$(BR2_ROOTFS_SKELETON_CUSTOM_SOURCE))
+SKELETON_CUSTOM_SITE_METHOD = $(call qstrip,$(BR2_ROOTFS_SKELETON_CUSTOM_SITE_METHOD))
+SKELETON_CUSTOM_EXTRACT = $(call qstrip,$(BR2_ROOTFS_SKELETON_CUSTOM_EXTRACT))
+ifneq ($(SKELETON_CUSTOM_SITE),)
+SKELETON_CUSTOM_PATH = $(BUILD_DIR)/skeleton-custom/custom
+else
 SKELETON_CUSTOM_PATH = $(call qstrip,$(BR2_ROOTFS_SKELETON_CUSTOM_PATH))
+endif
 
 ifeq ($(BR2_PACKAGE_SKELETON_CUSTOM)$(BR_BUILDING),yy)
 ifeq ($(SKELETON_CUSTOM_PATH),)
@@ -37,6 +45,22 @@ $(error The custom skeleton in $(SKELETON_CUSTOM_PATH) is not \
 	$(SKELETON_CUSTOM_NOT_MERGED_USR_DIRS))
 endif
 endif
+
+define SKELETON_CUSTOM_EXTRACT_CMDS
+	if [ $(BR2_ROOTFS_SKELETON_CUSTOM_SITE) != "" ]; then \
+		rm -rf $(@D)/custom; \
+		mkdir $(@D)/custom; \
+		if [ $(BR2_ROOTFS_SKELETON_CUSTOM_EXTRACT_IGNORE_ERROR) = y ]; then \
+			cd $(@D)/custom && $(SKELETON_CUSTOM_EXTRACT) $(DL_DIR)/skeleton-custom/$(SKELETON_CUSTOM_SOURCE) || true; \
+		else \
+			cd $(@D)/custom && $(SKELETON_CUSTOM_EXTRACT) $(DL_DIR)/skeleton-custom/$(SKELETON_CUSTOM_SOURCE); \
+		fi \
+	fi
+
+	@$(foreach s, $(call qstrip,$(BR2_ROOTFS_POST_CUSTOM_SKELETON_SCRIPT)), \
+		$(call MESSAGE,"Executing post-custom-skeleton script $(s)"); \
+		$(EXTRA_ENV) $(s) $(SKELETON_CUSTOM_PATH) $(call qstrip,$(BR2_ROOTFS_POST_CUSTOM_SKELETON_SCRIPT))$(sep))
+endef
 
 # The target-dir-warning file and the lib{32,64} symlinks are the only
 # things we customise in the custom skeleton.
